@@ -24,6 +24,6 @@ if(file_exists(__DIR__ . $uri) == false) {
 	exit;
 }
 
-
+header("Location: $uri", 301);
 
 /* End of file rewrite.php */
