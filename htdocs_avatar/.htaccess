@@ -1,0 +1,5 @@
+RewriteEngine   On
+
+RewriteCond     %{REQUEST_FILENAME}     !-f
+RewriteCond     %{REQUEST_FILENAME}     !-d
+RewriteRule     ^\d+_(small|middle|big)\.(jpg|png|gif)$ /rewrite.php [QSA,L]
