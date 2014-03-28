@@ -11,6 +11,16 @@ class TradeDetail extends \Phalcon\Mvc\Model {
 	
 	public $content;
 	
+	public $extra;
+	
+	public function beforeSave() {
+		$this->extra = serialize($this->extra);
+	}
+	
+	public function beforeFetch() {
+		$this->extra = unserialize($this->extra);
+	}
+	
 }
 
 /* End of file TradeDetail.php */

@@ -56,13 +56,12 @@ class Member extends \Phalcon\Mvc\Model {
 	
 	public function beforeValidation() {
 		if($this->password) {
+			$this->salt = self::salt();
 			$this->password = self::password($this->password, $this->salt);
 		}
 	}
 	
 	public function beforeValidationOnCreate() {
-		$this->salt = self::salt();
-		
 		if(!$this->status) {
 			$this->status = self::STATUS_UNAVALIABLE;
 		}
@@ -75,7 +74,7 @@ class Member extends \Phalcon\Mvc\Model {
 		
 		$this->validate(new \Phalcon\Mvc\Model\Validator\Regex(array(
 			'field' => 'username',
-			'pattern' => '/^[A-Za-z0-9_-]{6,30}$/',
+			'pattern' => '/^[A-Za-z0-9_-]{5,30}$/',
 			'message' => '用户名无效')));
 		
 		$this->validate(new \Phalcon\Mvc\Model\Validator\Regex(array(
@@ -83,9 +82,7 @@ class Member extends \Phalcon\Mvc\Model {
 			'pattern' => '/^[\w\W]{6,}$/i',
 			'message' => '密码无效')));
 		
-		if($this->validationHasFailed() == true) {
-			return false;
-		}
+		return $this->validationHasFailed() != true;
 	}
 	
 }

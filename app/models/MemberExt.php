@@ -36,9 +36,6 @@ class MemberExt extends \Phalcon\Mvc\Model {
 		$this->gender = 0;
 		$this->mobile = '';
 		$this->birth_date = '0000-00-00';
-		$this->province = '';
-		$this->city = '';
-		$this->district = '';
 		$this->avatar = 0;
 		$this->qq = '';
 		$this->create_at = $_SERVER['REQUEST_TIME'];
