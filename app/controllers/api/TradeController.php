@@ -30,7 +30,7 @@ class TradeController extends AuthMemberControllerBase {
 		$trade->tradeDetail = $tradeDetail;
 		$trade->user_id = $this->member->user_id;
 		$trade->username = $this->member->username;
-		$trade->flag = Trade::FLAG_DRAFT;
+		$trade->flag = Trade::FLAG_PUB;
 		
 		$is_succ = $trade->save($_GET, array('title', 'mode', 'category', 'price'));
 		if($is_succ == false) {

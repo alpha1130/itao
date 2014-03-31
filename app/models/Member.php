@@ -30,6 +30,7 @@ class Member extends \Phalcon\Mvc\Model {
 		$this->hasOne('user_id', 'MemberExt', 'user_id');
 		$this->hasOne('user_id', 'Balance', 'user_id');
 		$this->hasMany('user_id', 'MemberOpenid', 'user_id');
+		$this->hasMany('user_id', 'MemberActive', 'user_id');
 	}
 	
 	public static function salt() {

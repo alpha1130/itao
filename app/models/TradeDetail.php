@@ -4,6 +4,7 @@
  * 
  * $Id$
  */
+use \Phalcon\Mvc\Model\Message;
 
 class TradeDetail extends \Phalcon\Mvc\Model {
 	
@@ -12,6 +13,10 @@ class TradeDetail extends \Phalcon\Mvc\Model {
 	public $content;
 	
 	public $extra;
+	
+	public function validation() {
+		return $this->validationHasFailed() != true;
+	}
 	
 	public function beforeSave() {
 		$this->extra = serialize($this->extra);

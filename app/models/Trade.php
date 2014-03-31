@@ -5,7 +5,7 @@
  * $Id$
  */
 use Phalcon\Mvc\Model,
-	Phalcon\Mvc\Message;
+	Phalcon\Mvc\Model\Message;
 
 class Trade extends Model {
 
@@ -71,7 +71,6 @@ class Trade extends Model {
 			$this->appendMessage(new Message(
 				'标题不能必须介于5-30个字符',
 				'title'));
-			return false;
 		}
 		
 		if($this->mode == null || 
@@ -82,7 +81,18 @@ class Trade extends Model {
 			$this->appendMessage(new Message(
 				'交易模式无效',
 				'mode'));
-			return false;
+		}
+		
+		if($this->category < 1) {
+			$this->appendMessage(new Message(
+				'分类无效',
+				'category'));
+		}
+		$category = Category::findFirstByCategoryId($this->category);
+		if($category->category_type != Category::TYPE_NODE) {
+			$this->appendMessage(new Message(
+				'分类不存在',
+				'category'));
 		}
 		
 		return $this->validationHasFailed() != true;

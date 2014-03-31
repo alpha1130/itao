@@ -21,14 +21,13 @@ try {
 		$evt = new \Phalcon\Events\Manager();
 		$logger = new \Phalcon\Logger\Adapter\File($config['logsDir'] . 'db.debug.log');
 		
-		$evt->attach('db', function($event, $connection) use($logger) {
+		$evt->attach('db', function($event, $connection) use ($logger) {
 			if($event->getType() == 'beforeQuery') {
 				$logger->log($connection->getSQLStatement(), Logger::INFO);
 			}
 		});
 		
 		$connection = new \Phalcon\Db\Adapter\Pdo\Mysql($config['database']);
-		
 		$connection->setEventsManager($evt);
 		
 		return $connection;
@@ -36,13 +35,22 @@ try {
 	$di->set('view', function() use ($config) {
 		$view = new \Phalcon\Mvc\View();
 		$view->setViewsDir($config['viewsDir']);
+		
 		return $view;
 	});
 	$di->setShared('session', function() use ($config){
+		ini_set('session.name', 'sid');
 		$session = new Phalcon\Session\Adapter\Memcache($config['session']);
 		$session->start();
 		
 		return $session;
+	});
+	$di->set('modelsMetadata', function(){
+		$metaData = new \Phalcon\Mvc\Model\MetaData\Apc(array(
+			'lifetime' => 3600,
+			'prefix' => 'my-prefix'));
+		
+		return $metaData;
 	});
 	
 	$app = new \Phalcon\Mvc\Application($di);
