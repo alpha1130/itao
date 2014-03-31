@@ -11,6 +11,11 @@ class SignController extends Phalcon\Mvc\Controller {
 		$member = new Member();
 		$member->memberCount = new MemberCount();
 		$member->memberExt = new MemberExt();
+		$member->memberActive = new MemberActive();
+		$member->memberActive->active_ip = $this->request->getClientAddress(true);
+		$member->memberActive->active_type = MemberActive::TYPE_SIGN_UP;
+		$member->memberActive->active_memo = '新用户注册';
+
 		if($member->save($_GET, array('username', 'email', 'password')) == false) {
 			$errorMessage = join("\n", $member->getMessages());
 
@@ -40,8 +45,15 @@ class SignController extends Phalcon\Mvc\Controller {
 		if($member == false ||
 			Member::password($password, $member->salt) != $member->password) {
 			return $this->response->setJsonContent(array(
-				'status' => -1, 'message' => '登录邮箱与密码不匹配'));
+				'status' => -1, 'message' => '密码错误或登录邮箱与密码不匹配'));
 		}
+
+		$memberActive = new MemberActive();
+		$memberActive->active_type = MemberActive::TYPE_SIGN_IN;
+		$memberActive->active_ip = $this->request->getClientAddress(true);
+		$memberActive->active_memo = '用户登录';
+		$memberActive->user_id = $member->user_id;
+		$memberActive->save();
 
 		$this->session->set('member', serialize($member));
 
@@ -56,7 +68,7 @@ class SignController extends Phalcon\Mvc\Controller {
 			$this->session->remove('member');
 			$this->session->destroy();
 		}
-		
+
 		return $this->response->setJsonContent(array(
 			'status' => 1, 'message' => '注销成功'));
 	}
