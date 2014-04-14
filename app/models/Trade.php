@@ -97,6 +97,25 @@ class Trade extends Model {
 		
 		return $this->validationHasFailed() != true;
 	}
+	
+	/**
+	 * @return boolean
+	 */
+	public function isEditable() {
+		if($this->trade_id < 1) {
+			return false;
+		}
+		
+		$changeAbleFlag = array(
+			self::FLAG_PUB, 
+			self::FLAG_HIDE);
+		
+		if(!in_array($this->flag, $changeAbleFlag)) {
+			return false;
+		}
+		
+		return true;
+	}
 
 }
 

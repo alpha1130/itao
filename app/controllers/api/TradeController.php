@@ -70,29 +70,84 @@ class TradeController extends AuthMemberControllerBase {
 		
 		$tradeList = Trade::find($filter);
 		
-		var_dump($tradeList->toArray());exit;
+		return $this->response->setJsonContent(array(
+			'status' => 1,
+			'data' => $tradeList->toArray()));
 	}
 	
-	public function viewAction() {
+	public function detailAction() {
+		$trade = Trade::findFirstByTradeId($_GET['id']);
 		
+		if($trade == false || $trade->flag != Trade::FLAG_PUB) {
+			return $this->response->setJsonContent(array(
+				'status' => -1,
+				'message' => '交易不存在'
+				));
+		}
+		
+		return $this->response->setJsonContent(array(
+			'status' => 1,
+			'data' => $trade->toArray()));
 	}
 	
-	public function showAction() {
+	public function changeAction() {
+		$changeAbleFlag = array(Trade::FLAG_PUB, Trade::FLAG_HIDE);
 		
-	}
-	
-	public function hideAction() {
+		$id = $this->request->getQuery('id', 'int');
+		$flag = $this->request->getQuery('flag', 'int');
 		
+		if($id < 1 || !in_array($flag, $changeAbleFlag)) {
+			return $this->response->setJsonContent(array(
+				'status' => -1,
+				'message' => '参数无效'));
+		}
+		
+		$trade = Trade::findFirstByTradeId($_GET['id']);
+		
+		if($trade == false) {
+			return $this->response->setJsonContent(array(
+				'status' => -1,
+				'message' => '交易不存在'
+				));
+		}
+		
+		if($trade->user_id != $this->member->user_id) {
+			return $this->response->setJsonContent(array(
+				'status' => -1,
+				'message' => '无权访问此交易'));
+		}
+		
+		if($trade->isEditable() == false) {
+			return $this->response->setJsonContent(array(
+				'status' => -1,
+				'message' => '当前交易无法修改状态'));
+		}
+		
+		$trade->flag = $flag;
+		$is_succ = $trade->save();
+		if($is_succ == false) {
+			$errorMessage = join(',', $trade->getMessages());
+			
+			return $this->response->setJsonContent(array(
+				'status' => -1, 
+				'message' => $errorMessage));
+		}
+		
+		return $this->response->setJsonContent(array(
+			'status' => 1, 
+			'message' => '交易状态修改成功'
+			));
 	}
 	
 	public function createAction() {
 		$trade = new Trade();
-		$tradeDetail = new TradeDetail();
-		$tradeDetail->content = $this->request->getQuery('content', 'string');
-		$trade->tradeDetail = $tradeDetail;
 		$trade->user_id = $this->member->user_id;
 		$trade->username = $this->member->username;
 		$trade->flag = Trade::FLAG_PUB;
+		
+		$tradeDetail = new TradeDetail();
+		$tradeDetail->content = $this->request->getQuery('content', 'string');
+		$trade->tradeDetail = $tradeDetail;
 		
 		$is_succ = $trade->save($_GET, array('title', 'mode', 'category', 'price'));
 		if($is_succ == false) {
@@ -108,6 +163,8 @@ class TradeController extends AuthMemberControllerBase {
 	}
 	
 	public function editAction() {
+		$id = $this->request->getPost('id', 'int');
+		
 		
 	}
 	
